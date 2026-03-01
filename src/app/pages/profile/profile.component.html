@@ -1,0 +1,71 @@
+<div class="container py-4 fade-in">
+      <h2 class="fw-bold mb-4"><i class="bi bi-person me-2"></i>My Profile</h2>
+
+      @if (loading) {
+        <div class="loading-overlay">
+          <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+        </div>
+      } @else if (profile) {
+        <div class="row g-4">
+          <!-- Profile Info -->
+          <div class="col-lg-8">
+            <div class="card shadow-sm">
+              <div class="card-header fw-semibold"><i class="bi bi-person-lines-fill me-2"></i>Personal Information</div>
+              <div class="card-body">
+                <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label">First Name</label>
+                      <input type="text" class="form-control" formControlName="firstName">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Last Name</label>
+                      <input type="text" class="form-control" formControlName="lastName">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Email</label>
+                      <input type="email" class="form-control" formControlName="email">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Phone</label>
+                      <input type="text" class="form-control" formControlName="phone">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Address</label>
+                      <textarea class="form-control" rows="2" formControlName="address"></textarea>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary mt-3" [disabled]="saving">
+                    @if (saving) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                    <i class="bi bi-check-lg me-1"></i>Save Changes
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Change Password -->
+          <div class="col-lg-4">
+            <div class="card shadow-sm">
+              <div class="card-header fw-semibold"><i class="bi bi-shield-lock me-2"></i>Change Password</div>
+              <div class="card-body">
+                <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+                  <div class="mb-3">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" class="form-control" formControlName="currentPassword">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-control" formControlName="newPassword">
+                  </div>
+                  <button type="submit" class="btn btn-outline-primary w-100" [disabled]="changingPwd">
+                    @if (changingPwd) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                    Change Password
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>

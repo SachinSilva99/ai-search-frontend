@@ -1,0 +1,132 @@
+<div class="fade-in">
+      <div class="page-header">
+        <h2><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
+      </div>
+
+      @if (loading) {
+        <div class="loading-overlay">
+          <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+        </div>
+      } @else if (dashboard) {
+        <!-- Stat Cards -->
+        <div class="row g-4 mb-4">
+          <div class="col-sm-6 col-xl-3">
+            <div class="card stat-card shadow-sm">
+              <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-people"></i></div>
+                <div>
+                  <div class="text-body-secondary small">Total Users</div>
+                  <div class="fs-4 fw-bold">{{ dashboard.totalUsers }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card stat-card shadow-sm">
+              <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-success bg-opacity-10 text-success"><i class="bi bi-bag-check"></i></div>
+                <div>
+                  <div class="text-body-secondary small">Total Orders</div>
+                  <div class="fs-4 fw-bold">{{ dashboard.totalOrders }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card stat-card shadow-sm">
+              <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-currency-dollar"></i></div>
+                <div>
+                  <div class="text-body-secondary small">Total Revenue</div>
+                  <div class="fs-4 fw-bold">\${{ dashboard.totalRevenue | number:'1.2-2' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card stat-card shadow-sm">
+              <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-info bg-opacity-10 text-info"><i class="bi bi-hourglass-split"></i></div>
+                <div>
+                  <div class="text-body-secondary small">Pending Orders</div>
+                  <div class="fs-4 fw-bold">{{ dashboard.ordersByStatus['PENDING'] || 0 }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- Monthly Sales Chart -->
+          <div class="col-lg-8">
+            <div class="card shadow-sm">
+              <div class="card-header fw-semibold"><i class="bi bi-bar-chart me-2"></i>Monthly Sales</div>
+              <div class="card-body">
+                @if (dashboard.monthlySales.length > 0) {
+                  <div class="chart-bar-container">
+                    @for (m of dashboard.monthlySales; track m.month) {
+                      <div class="chart-bar" [style.height.%]="getBarHeight(m.totalSales)"
+                           [title]="getMonthName(m.month) + ': $' + m.totalSales">
+                      </div>
+                    }
+                  </div>
+                  <div class="d-flex justify-content-between mt-1" style="font-size:0.75rem">
+                    @for (m of dashboard.monthlySales; track m.month) {
+                      <span class="text-body-secondary text-center" style="flex:1">{{ getMonthName(m.month) }}</span>
+                    }
+                  </div>
+                } @else {
+                  <div class="text-center py-4 text-body-secondary">No sales data yet</div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Orders by Status -->
+          <div class="col-lg-4">
+            <div class="card shadow-sm">
+              <div class="card-header fw-semibold"><i class="bi bi-pie-chart me-2"></i>Orders by Status</div>
+              <div class="card-body">
+                @for (entry of getStatusEntries(); track entry.key) {
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge" [class]="'badge-' + entry.key">{{ entry.key }}</span>
+                    <span class="fw-bold">{{ entry.value }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Orders -->
+          <div class="col-12">
+            <div class="card shadow-sm">
+              <div class="card-header fw-semibold"><i class="bi bi-clock-history me-2"></i>Recent Orders</div>
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Order #</th>
+                      <th>Date</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                      <th>Payment</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (order of dashboard.recentOrders; track order.orderId) {
+                      <tr>
+                        <td class="fw-medium">#{{ order.orderId }}</td>
+                        <td>{{ order.createdAt | date:'short' }}</td>
+                        <td>\${{ order.totalAmount | number:'1.2-2' }}</td>
+                        <td><span class="badge" [class]="'badge-' + order.orderStatus">{{ order.orderStatus }}</span></td>
+                        <td>{{ order.paymentMethod }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>

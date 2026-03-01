@@ -1,0 +1,67 @@
+<div class="container py-5 fade-in">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-body p-4">
+              <div class="text-center mb-4">
+                <i class="bi bi-person-plus fs-1 text-primary"></i>
+                <h3 class="fw-bold mt-2">Create Account</h3>
+                <p class="text-body-secondary">Join ShopSmart today</p>
+              </div>
+              <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">First Name</label>
+                    <input type="text" class="form-control" formControlName="firstName"
+                           [class.is-invalid]="submitted && f['firstName'].errors">
+                    @if (submitted && f['firstName'].errors?.['required']) { <div class="invalid-feedback">Required</div> }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" class="form-control" formControlName="lastName"
+                           [class.is-invalid]="submitted && f['lastName'].errors">
+                    @if (submitted && f['lastName'].errors?.['required']) { <div class="invalid-feedback">Required</div> }
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Email</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                      <input type="email" class="form-control" placeholder="you@example.com"
+                             formControlName="email"
+                             [class.is-invalid]="submitted && f['email'].errors">
+                    </div>
+                    @if (submitted && f['email'].errors?.['required']) { <div class="text-danger small mt-1">Email is required</div> }
+                    @if (submitted && f['email'].errors?.['email']) { <div class="text-danger small mt-1">Invalid email format</div> }
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                      <input type="password" class="form-control" placeholder="Min 6 characters"
+                             formControlName="password"
+                             [class.is-invalid]="submitted && f['password'].errors">
+                    </div>
+                    @if (submitted && f['password'].errors?.['required']) { <div class="text-danger small mt-1">Password is required</div> }
+                    @if (submitted && f['password'].errors?.['minlength']) { <div class="text-danger small mt-1">Min 6 characters</div> }
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Phone <span class="text-body-secondary">(Optional)</span></label>
+                    <input type="text" class="form-control" formControlName="phone">
+                  </div>
+                </div>
+                @if (errorMsg) {
+                  <div class="alert alert-danger py-2 mt-3"><i class="bi bi-exclamation-circle me-2"></i>{{ errorMsg }}</div>
+                }
+                <button type="submit" class="btn btn-primary w-100 btn-lg mt-3" [disabled]="loading">
+                  @if (loading) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                  Create Account
+                </button>
+              </form>
+              <p class="text-center mt-3 mb-0 text-body-secondary">
+                Already have an account? <a routerLink="/login" class="text-decoration-none">Sign in</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

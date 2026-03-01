@@ -1,0 +1,50 @@
+<div class="container py-4 fade-in">
+      <h2 class="fw-bold mb-4"><i class="bi bi-bag me-2"></i>My Orders</h2>
+
+      @if (loading) {
+        <div class="loading-overlay">
+          <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+        </div>
+      } @else if (orders.length === 0) {
+        <div class="empty-state">
+          <i class="bi bi-bag-x d-block"></i>
+          <h5>No orders yet</h5>
+          <p class="text-body-secondary mb-3">Start shopping to see your orders here.</p>
+          <a routerLink="/products" class="btn btn-primary">Browse Products</a>
+        </div>
+      } @else {
+        <div class="row g-3">
+          @for (order of orders; track order.orderId) {
+            <div class="col-12">
+              <div class="card shadow-sm">
+                <div class="card-body">
+                  <div class="row align-items-center">
+                    <div class="col-md-2">
+                      <small class="text-body-secondary">Order #</small>
+                      <div class="fw-bold">{{ order.orderId }}</div>
+                    </div>
+                    <div class="col-md-3">
+                      <small class="text-body-secondary">Date</small>
+                      <div>{{ order.createdAt | date:'mediumDate' }}</div>
+                    </div>
+                    <div class="col-md-2">
+                      <small class="text-body-secondary">Total</small>
+                      <div class="fw-bold">\${{ order.totalAmount | number:'1.2-2' }}</div>
+                    </div>
+                    <div class="col-md-2">
+                      <small class="text-body-secondary">Status</small>
+                      <div><span class="badge" [class]="'badge-' + order.orderStatus">{{ order.orderStatus }}</span></div>
+                    </div>
+                    <div class="col-md-3 text-md-end mt-2 mt-md-0">
+                      <a [routerLink]="['/orders', order.orderId]" class="btn btn-outline-primary btn-sm">
+                        View Details <i class="bi bi-chevron-right"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>

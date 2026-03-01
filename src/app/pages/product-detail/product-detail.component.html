@@ -1,0 +1,50 @@
+<div class="container py-4 fade-in">
+      @if (loading) {
+        <div class="loading-overlay">
+          <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+        </div>
+      } @else if (product) {
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+            <li class="breadcrumb-item"><a routerLink="/products">Products</a></li>
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+          </ol>
+        </nav>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <img [src]="product.imageUrl || 'https://via.placeholder.com/600x450?text=No+Image'"
+                 [alt]="product.name" class="img-fluid product-detail-img w-100 shadow-sm">
+          </div>
+          <div class="col-md-6">
+            <span class="badge bg-primary bg-opacity-10 text-primary mb-2">{{ product.categoryName }}</span>
+            <h2 class="fw-bold">{{ product.name }}</h2>
+            <p class="fs-3 fw-bold" style="color: #667eea">
+              \${{ product.price | number:'1.2-2' }}
+            </p>
+            <hr>
+            <p class="text-body-secondary lh-lg">{{ product.description }}</p>
+            <hr>
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <label class="fw-semibold">Quantity:</label>
+              <div class="qty-control border rounded">
+                <button class="btn btn-outline-secondary" (click)="quantity > 1 && quantity = quantity - 1">
+                  <i class="bi bi-dash"></i>
+                </button>
+                <span>{{ quantity }}</span>
+                <button class="btn btn-outline-secondary" (click)="quantity = quantity + 1">
+                  <i class="bi bi-plus"></i>
+                </button>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-lg w-100" (click)="addToCart()" [disabled]="addingToCart">
+              @if (addingToCart) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+              }
+              <i class="bi bi-cart-plus me-2"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+      }
+    </div>
