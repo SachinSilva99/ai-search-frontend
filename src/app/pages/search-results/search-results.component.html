@@ -1,16 +1,46 @@
 <div class="container py-4 fade-in">
-      <!-- Search bar -->
+      <!-- Search bar with mode toggle -->
       <div class="row justify-content-center mb-4">
         <div class="col-lg-8">
+          <!-- Search Mode Tabs -->
+          <div class="d-flex justify-content-center mb-3">
+            <div class="btn-group" role="group" aria-label="Search mode">
+              <button type="button" class="btn"
+                      [class.btn-primary]="searchMode === 'ai'"
+                      [class.btn-outline-primary]="searchMode !== 'ai'"
+                      (click)="setSearchMode('ai')">
+                <i class="bi bi-stars me-1"></i>AI Search
+              </button>
+              <button type="button" class="btn"
+                      [class.btn-primary]="searchMode === 'title'"
+                      [class.btn-outline-primary]="searchMode !== 'title'"
+                      (click)="setSearchMode('title')">
+                <i class="bi bi-fonts me-1"></i>Title Search
+              </button>
+            </div>
+          </div>
+
           <div class="input-group input-group-lg shadow-sm">
-            <span class="input-group-text bg-body border-end-0"><i class="bi bi-search"></i></span>
+            <span class="input-group-text bg-body border-end-0">
+              <i [class]="searchMode === 'ai' ? 'bi bi-stars' : 'bi bi-search'"></i>
+            </span>
             <input type="text" class="form-control border-start-0"
-                   placeholder="Search with AI..."
+                   [placeholder]="searchMode === 'ai' ? 'Search with AI... e.g. something to keep drinks cold' : 'Search by product name...'"
                    [value]="searchQuery" (input)="searchQuery = $any($event.target).value"
                    (keyup.enter)="onSearch()">
             <button class="btn btn-primary" (click)="onSearch()" [disabled]="!searchQuery.trim()">
-              <i class="bi bi-stars me-1"></i>Search
+              <i [class]="searchMode === 'ai' ? 'bi bi-stars me-1' : 'bi bi-search me-1'"></i>Search
             </button>
+          </div>
+
+          <div class="text-center mt-2">
+            <small class="text-body-secondary">
+              @if (searchMode === 'ai') {
+                <i class="bi bi-info-circle me-1"></i>AI search understands natural language — try describing what you need
+              } @else {
+                <i class="bi bi-info-circle me-1"></i>Title search matches product names — try typing a product name or keyword
+              }
+            </small>
           </div>
         </div>
       </div>
@@ -19,34 +49,70 @@
         <div class="loading-overlay">
           <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
         </div>
-      } @else if (searched && results.length === 0) {
+      } @else if (searched && !hasResults) {
         <div class="empty-state">
           <i class="bi bi-search d-block"></i>
           <h5>No results found</h5>
-          <p class="text-body-secondary">Try different keywords or rephrase your query.</p>
+          <p class="text-body-secondary">
+            @if (searchMode === 'ai') {
+              Try different keywords or rephrase your query.
+            } @else {
+              No products match that name. Try a different keyword or switch to <strong>AI Search</strong>.
+            }
+          </p>
         </div>
-      } @else if (results.length > 0) {
-        <h5 class="mb-3">{{ results.length }} result(s) for "<strong>{{ lastQuery }}</strong>"</h5>
+      } @else if (hasResults) {
+        <h5 class="mb-3">
+          {{ resultCount }} result(s) for "<strong>{{ lastQuery }}</strong>"
+          <span class="badge bg-secondary bg-opacity-25 text-body-secondary ms-2" style="font-size:0.7rem">
+            @if (searchMode === 'ai') {
+              <i class="bi bi-stars me-1"></i>AI Search
+            } @else {
+              <i class="bi bi-fonts me-1"></i>Title Search
+            }
+          </span>
+        </h5>
         <div class="row g-4">
-          @for (result of results; track result.productId) {
-            <div class="col-md-6 col-lg-4">
-              <div class="card product-card h-100 shadow-sm" [routerLink]="['/products', result.productId]" style="cursor:pointer">
-                <div class="position-relative">
-                  <img [src]="result.imageUrl || 'https://via.placeholder.com/400x300?text=No+Image'"
-                       [alt]="result.productName" class="card-img-top" loading="lazy">
-                  <span class="badge position-absolute top-0 end-0 m-2"
-                        [class]="getConfidenceClass(result.confidenceScore)">
-                    <i class="bi bi-stars me-1"></i>{{ (result.confidenceScore * 100) | number:'1.0-0' }}% match
-                  </span>
-                </div>
-                <div class="card-body d-flex flex-column">
-                  <span class="badge bg-secondary bg-opacity-10 text-body-secondary mb-2 align-self-start" style="font-size:0.75rem">{{ result.categoryName }}</span>
-                  <h6 class="card-title mb-1">{{ result.productName }}</h6>
-                  <p class="text-body-secondary small mb-2">{{ result.description | slice:0:100 }}...</p>
-                  <p class="price mt-auto mb-0">\${{ result.price | number:'1.2-2' }}</p>
+          <!-- AI Search Results -->
+          @if (searchMode === 'ai') {
+            @for (result of results; track result.productId) {
+              <div class="col-md-6 col-lg-4">
+                <div class="card product-card h-100 shadow-sm" [routerLink]="['/products', result.productId]" style="cursor:pointer">
+                  <div class="position-relative">
+                    <img [src]="result.imageUrl || 'https://via.placeholder.com/400x300?text=No+Image'"
+                         [alt]="result.productName" class="card-img-top" loading="lazy">
+                    <span class="badge position-absolute top-0 end-0 m-2"
+                          [class]="getConfidenceClass(result.confidenceScore)">
+                      <i class="bi bi-stars me-1"></i>{{ (result.confidenceScore * 100) | number:'1.0-0' }}% match
+                    </span>
+                  </div>
+                  <div class="card-body d-flex flex-column">
+                    <span class="badge bg-secondary bg-opacity-10 text-body-secondary mb-2 align-self-start" style="font-size:0.75rem">{{ result.categoryName }}</span>
+                    <h6 class="card-title mb-1">{{ result.productName }}</h6>
+                    <p class="text-body-secondary small mb-2">{{ result.description | slice:0:100 }}...</p>
+                    <p class="price mt-auto mb-0">\${{ result.price | number:'1.2-2' }}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            }
+          }
+
+          <!-- Title Search Results -->
+          @if (searchMode === 'title') {
+            @for (product of titleResults; track product.id) {
+              <div class="col-md-6 col-lg-4">
+                <div class="card product-card h-100 shadow-sm" [routerLink]="['/products', product.id]" style="cursor:pointer">
+                  <img [src]="product.imageUrl || 'https://via.placeholder.com/400x300?text=No+Image'"
+                       [alt]="product.name" class="card-img-top" loading="lazy">
+                  <div class="card-body d-flex flex-column">
+                    <span class="badge bg-secondary bg-opacity-10 text-body-secondary mb-2 align-self-start" style="font-size:0.75rem">{{ product.categoryName }}</span>
+                    <h6 class="card-title mb-1">{{ product.name }}</h6>
+                    <p class="text-body-secondary small mb-2">{{ product.description | slice:0:100 }}...</p>
+                    <p class="price mt-auto mb-0">\${{ product.price | number:'1.2-2' }}</p>
+                  </div>
+                </div>
+              </div>
+            }
           }
         </div>
       }
