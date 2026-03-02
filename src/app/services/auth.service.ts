@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { ApiResponse, LoginRequest, LoginResponse, RegisterRequest, StoredUser } from '../models/models';
+import { ApiResponse, LoginRequest, LoginResponse, OtpResponse, OtpVerifyRequest, StoredUser } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -11,8 +11,14 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  login(req: LoginRequest): Observable<ApiResponse<LoginResponse>> {
-    return this.http.post<ApiResponse<LoginResponse>>('/api/auth/login', req).pipe(
+  /** Step 1: send email+password → backend validates and sends OTP */
+  login(req: LoginRequest): Observable<ApiResponse<OtpResponse>> {
+    return this.http.post<ApiResponse<OtpResponse>>('/api/auth/login', req);
+  }
+
+  /** Step 2: verify OTP → get JWT token */
+  verifyOtp(req: OtpVerifyRequest): Observable<ApiResponse<LoginResponse>> {
+    return this.http.post<ApiResponse<LoginResponse>>('/api/auth/login/verify-otp', req).pipe(
       tap(res => {
         if (res.status === 'success') {
           localStorage.setItem('token', res.data.token);
@@ -29,7 +35,7 @@ export class AuthService {
     );
   }
 
-  register(req: RegisterRequest): Observable<ApiResponse<{ userId: number }>> {
+  register(req: any): Observable<ApiResponse<{ userId: number }>> {
     return this.http.post<ApiResponse<{ userId: number }>>('/api/auth/register', req);
   }
 

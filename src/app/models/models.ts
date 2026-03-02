@@ -27,6 +27,16 @@ export interface LoginResponse {
   role: string;
 }
 
+export interface OtpResponse {
+  message: string;
+  email: string;
+}
+
+export interface OtpVerifyRequest {
+  email: string;
+  otp: string;
+}
+
 // Product
 export interface ProductDto {
   id: number;
